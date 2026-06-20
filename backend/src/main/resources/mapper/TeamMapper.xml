@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.campuslink.mapper.TeamMapper">
+
+    <resultMap id="TeamListVOMap" type="com.campuslink.dto.TeamListVO">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="competition_id" property="competitionId"/>
+        <result column="competition_name" property="competitionName"/>
+        <result column="leader_id" property="leaderId"/>
+        <result column="leader_name" property="leaderName"/>
+        <result column="intro" property="intro"/>
+        <result column="total_size" property="totalSize"/>
+        <result column="current_size" property="currentSize"/>
+        <result column="college" property="college"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="vacancies" property="vacancies"/>
+    </resultMap>
+
+    <select id="pageTeams" resultMap="TeamListVOMap">
+        SELECT
+            t.id, t.name, t.competition_id, c.name AS competition_name,
+            t.leader_id, u.nickname AS leader_name, t.intro,
+            t.total_size, t.current_size, t.college, t.status, t.create_time,
+            (
+                SELECT GROUP_CONCAT(CONCAT(r.position, '×', (r.count - r.filled)) SEPARATOR ', ')
+                FROM team_recruit r
+                WHERE r.team_id = t.id AND r.count > r.filled
+            ) AS vacancies
+        FROM team t
+        LEFT JOIN competition c ON c.id = t.competition_id
+        LEFT JOIN user u ON u.id = t.leader_id
+        <where>
+            <if test="q.competitionId != null">
+                AND t.competition_id = #{q.competitionId}
+            </if>
+            <if test="q.college != null and q.college != ''">
+                AND t.college = #{q.college}
+            </if>
+            <if test="q.grade != null">
+                AND u.grade = #{q.grade}
+            </if>
+            <if test="q.status != null and q.status != ''">
+                AND t.status = #{q.status}
+            </if>
+            <if test="q.keyword != null and q.keyword != ''">
+                AND (t.name LIKE CONCAT('%', #{q.keyword}, '%')
+                     OR t.intro LIKE CONCAT('%', #{q.keyword}, '%'))
+            </if>
+            <if test="q.skill != null and q.skill != ''">
+                AND EXISTS (
+                    SELECT 1 FROM team_recruit r2
+                    WHERE r2.team_id = t.id
+                      AND r2.position LIKE CONCAT('%', #{q.skill}, '%')
+                )
+            </if>
+        </where>
+        ORDER BY t.create_time DESC
+    </select>
+
+</mapper>
