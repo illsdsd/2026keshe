@@ -81,12 +81,40 @@
 
 ---
 
-## 模块 4-8（Day6 起实现，先约定接口）
+## 模块 4：申请加入模块（已实现）
+
+| 方法 | 路径 | 说明 | 鉴权 |
+| --- | --- | --- | --- |
+| POST | `/api/apply` | 学生提交申请（自我介绍/技能说明/主页链接） | 是 |
+| GET | `/api/apply/team/{teamId}` | 队长查看本队申请 | LEADER |
+| GET | `/api/apply/mine` | 我提交的申请 | 是 |
+| PUT | `/api/apply/{id}/audit` | 队长审核（`{approved, reason}`），通过则加入成员，结果以站内消息推送 | LEADER |
+
+## 模块 5：队内协作模块（已实现）
+
+| 方法 | 路径 | 说明 | 鉴权 |
+| --- | --- | --- | --- |
+| GET | `/api/task/team/{teamId}` | 看板任务列表（含负责人） | 成员 |
+| GET | `/api/task/team/{teamId}/stat` | 进度统计（各状态数量） | 成员 |
+| POST | `/api/task` | 新建任务（可指派负责人，触发站内消息） | 成员 |
+| PUT | `/api/task/{id}` | 编辑任务 | 成员 |
+| PUT | `/api/task/{id}/status` | 看板拖拽：更新状态与排序（`{status, sortOrder}`） | 成员 |
+| DELETE | `/api/task/{id}` | 删除任务 | 成员 |
+
+## 模块 6：公告模块（已实现）
+
+| 方法 | 路径 | 说明 | 鉴权 |
+| --- | --- | --- | --- |
+| GET | `/api/notice/team/{teamId}` | 队伍公告列表（含发布者） | 成员 |
+| POST | `/api/notice` | 队长发布公告，向其余成员推送站内消息 | LEADER |
+| DELETE | `/api/notice/{id}` | 队长删除公告 | LEADER |
+
+## 模块 7-8（Day9-10 实现，先约定接口）
 
 | 模块 | 关键接口 |
 | --- | --- |
-| 申请加入 | `POST /api/apply`、`GET /api/apply/team/{teamId}`、`PUT /api/apply/{id}/audit` |
-| 协作看板 | `GET /api/task/team/{teamId}`、`POST /api/task`、`PUT /api/task/{id}/status`、`GET /api/task/team/{teamId}/stat` |
-| 公告 | `GET /api/notice/team/{teamId}`、`POST /api/notice` |
-| 消息 | `GET /api/message`、`GET /api/message/unread/count`、`PUT /api/message/{id}/read` |
+| 消息中心 | `GET /api/message`、`GET /api/message/unread/count`、`PUT /api/message/{id}/read` |
 | 评价 | `POST /api/evaluation`、`GET /api/evaluation/user/{userId}` |
+
+> 注：站内消息的**写入**能力（申请/审核/任务指派/公告推送）已在 Day6-8 随业务实现，
+> 消息中心的查询 / 已读 / 未读计数接口在 Day9-10 提供。
