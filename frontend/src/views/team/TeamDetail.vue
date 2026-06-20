@@ -20,6 +20,9 @@
             </div>
           </div>
           <div class="head-ops">
+            <el-button v-if="isMember || isLeader" @click="$router.push(`/teams/${team.id}/board`)">
+              <el-icon><Grid /></el-icon> 任务看板
+            </el-button>
             <template v-if="isLeader">
               <el-button type="primary" @click="$router.push(`/teams/${team.id}/applies`)">
                 申请管理
