@@ -1,0 +1,11 @@
+target/
+*.class
+backend/target/
+node_modules/
+frontend/dist/
+.idea/
+*.iml
+.vscode/
+.DS_Store
+*.log
+frontend/.vite/
