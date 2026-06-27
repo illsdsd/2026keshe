@@ -27,6 +27,12 @@ public class Notice {
 
     private String content;
 
+    /** 定时发布时间，v2 新增；null 表示即时发布 */
+    private LocalDateTime publishAt;
+
+    /** 0即时/1定时，v2 新增 */
+    private Integer scheduled;
+
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 }

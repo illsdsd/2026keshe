@@ -15,6 +15,10 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: Asia/Shanghai
     default-property-inclusion: non_null
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 200MB
 
 mybatis-plus:
   configuration:
@@ -36,6 +40,24 @@ campuslink:
     expiration: 604800000
     header: Authorization
     prefix: "Bearer "
+  file:
+    storage-path: ${user.home}/campuslink/uploads
+    max-size-mb: 50
+    allowed-extensions: jpg,jpeg,png,gif,bmp,pdf,doc,docx,xls,xlsx,ppt,pptx,zip,rar,7z,txt,md
+  mail:
+    mock: true
+    sender: noreply@campuslink.local
+  security:
+    max-login-fail: 5
+    lock-minutes: 10
+  schedule:
+    recruit-expire-cron: "0 0/30 * * * ?"
+    team-archive-cron: "0 0 3 * * ?"
+    task-overdue-cron: "0 0 9 * * ?"
+    file-clean-cron: "0 0 4 * * ?"
+    message-digest-cron: "0 0 20 * * ?"
+  feature:
+    admin-enabled: true
 
 logging:
   level:

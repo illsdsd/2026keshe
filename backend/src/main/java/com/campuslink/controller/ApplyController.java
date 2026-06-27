@@ -47,4 +47,23 @@ public class ApplyController {
         applyService.audit(id, dto, SecurityUtil.getUserId());
         return Result.success();
     }
+
+    /** v2 批量申请 */
+    @PostMapping("/batch")
+    public Result<java.util.Map<String, Object>> batch(@RequestBody List<ApplyDTO> dtos) {
+        return Result.success(applyService.batchApply(dtos, SecurityUtil.getUserId()));
+    }
+
+    /** v2 申请撤回 */
+    @PutMapping("/{id}/cancel")
+    public Result<Void> cancel(@PathVariable Long id) {
+        applyService.cancel(id, SecurityUtil.getUserId());
+        return Result.success();
+    }
+
+    /** v2 申请通过率统计 */
+    @GetMapping("/stat")
+    public Result<java.util.Map<String, Object>> stat() {
+        return Result.success(applyService.stat(SecurityUtil.getUserId()));
+    }
 }

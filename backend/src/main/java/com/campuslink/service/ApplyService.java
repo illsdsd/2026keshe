@@ -15,23 +15,35 @@ import com.campuslink.mapper.TeamMapper;
 import com.campuslink.mapper.TeamMemberMapper;
 import com.campuslink.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 申请加入服务：提交、审核、状态流转，并联动队伍成员与站内消息。
+ *
+ * <p>v2 升级：申请前先校验黑名单；新增批量申请、撤回、统计接口。
  */
 @Service
 @RequiredArgsConstructor
 public class ApplyService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApplyService.class);
 
     private final ApplyMapper applyMapper;
     private final TeamMapper teamMapper;
     private final TeamMemberMapper teamMemberMapper;
     private final UserMapper userMapper;
     private final MessageService messageService;
+
+    @Lazy
+    private final TeamExtraService teamExtraService;
 
     /** 学生提交申请 */
     @Transactional(rollbackFor = Exception.class)
@@ -40,11 +52,19 @@ public class ApplyService {
         if (team == null) {
             throw new BusinessException(ResultCode.NOT_FOUND, "队伍不存在");
         }
+        if ("ARCHIVED".equals(team.getStatus())) {
+            throw new BusinessException(ResultCode.TEAM_ARCHIVED);
+        }
         if (!"RECRUITING".equals(team.getStatus())) {
             throw new BusinessException("该队伍已停止招募");
         }
         if (team.getLeaderId().equals(userId)) {
             throw new BusinessException("你是该队伍队长，无需申请");
+        }
+        // v2 黑名单校验
+        if (teamExtraService.isBlacklisted(dto.getTeamId(), userId)) {
+            LOGGER.warn("申请被拦截：用户在该队伍黑名单中, teamId={}, userId={}", dto.getTeamId(), userId);
+            throw new BusinessException(ResultCode.TEAM_BLACKLISTED);
         }
         // 已是成员
         Long isMember = teamMemberMapper.selectCount(new LambdaQueryWrapper<TeamMember>()
@@ -70,12 +90,71 @@ public class ApplyService {
         apply.setProfileLink(dto.getProfileLink());
         apply.setStatus("PENDING");
         applyMapper.insert(apply);
+        LOGGER.info("申请已提交, applyId={}, userId={}, teamId={}", apply.getId(), userId, dto.getTeamId());
 
         // 通知队长
         User applicant = userMapper.selectById(userId);
         String nick = applicant != null ? applicant.getNickname() : "有人";
         messageService.create(team.getLeaderId(), "APPLY",
                 String.format("%s 申请加入你的队伍「%s」", nick, team.getName()), apply.getId());
+    }
+
+    /** v2 批量申请 */
+    public Map<String, Object> batchApply(List<ApplyDTO> dtos, Long userId) {
+        int success = 0;
+        int failed = 0;
+        java.util.List<String> messages = new java.util.ArrayList<>();
+        for (ApplyDTO dto : dtos) {
+            try {
+                apply(dto, userId);
+                success++;
+            } catch (Exception e) {
+                failed++;
+                messages.add("teamId=" + dto.getTeamId() + ": " + e.getMessage());
+                LOGGER.warn("批量申请单条失败, teamId={}, msg={}", dto.getTeamId(), e.getMessage());
+            }
+        }
+        Map<String, Object> result = new HashMap<>();
+        result.put("success", success);
+        result.put("failed", failed);
+        result.put("messages", messages);
+        LOGGER.info("批量申请完成, userId={}, total={}, success={}, failed={}", userId, dtos.size(), success, failed);
+        return result;
+    }
+
+    /** v2 申请撤回（仅 PENDING 可撤） */
+    public void cancel(Long applyId, Long userId) {
+        Apply apply = applyMapper.selectById(applyId);
+        if (apply == null) {
+            throw new BusinessException(ResultCode.NOT_FOUND);
+        }
+        if (!apply.getUserId().equals(userId)) {
+            throw new BusinessException(ResultCode.FORBIDDEN);
+        }
+        if (!"PENDING".equals(apply.getStatus())) {
+            throw new BusinessException(ResultCode.APPLY_NOT_PENDING);
+        }
+        applyMapper.deleteById(applyId);
+        LOGGER.info("申请已撤回, applyId={}, userId={}", applyId, userId);
+    }
+
+    /** v2 申请通过率统计 */
+    public Map<String, Object> stat(Long userId) {
+        Long total = applyMapper.selectCount(new LambdaQueryWrapper<Apply>().eq(Apply::getUserId, userId));
+        Long approved = applyMapper.selectCount(new LambdaQueryWrapper<Apply>()
+                .eq(Apply::getUserId, userId).eq(Apply::getStatus, "APPROVED"));
+        Long rejected = applyMapper.selectCount(new LambdaQueryWrapper<Apply>()
+                .eq(Apply::getUserId, userId).eq(Apply::getStatus, "REJECTED"));
+        Long pending = applyMapper.selectCount(new LambdaQueryWrapper<Apply>()
+                .eq(Apply::getUserId, userId).eq(Apply::getStatus, "PENDING"));
+        Map<String, Object> data = new HashMap<>();
+        data.put("total", total);
+        data.put("approved", approved);
+        data.put("rejected", rejected);
+        data.put("pending", pending);
+        double rate = total == null || total == 0 ? 0 : (approved == null ? 0 : approved.doubleValue() / total);
+        data.put("approveRate", rate);
+        return data;
     }
 
     /** 队长查看本队申请 */

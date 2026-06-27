@@ -33,8 +33,11 @@ public class Team {
 
     private String college;
 
-    /** RECRUITING / FULL / CLOSED */
+    /** RECRUITING / FULL / CLOSED / ARCHIVED（v2 新增 ARCHIVED） */
     private String status;
+
+    /** 归档时间，v2 新增 */
+    private LocalDateTime archivedTime;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;

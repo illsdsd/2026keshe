@@ -25,7 +25,9 @@
         </el-button>
       </el-form>
       <div class="auth-footer">
-        没有账号？<router-link to="/register">去注册</router-link>
+        <router-link to="/forget-password" class="link-secondary">忘记密码？</router-link>
+        <span>·</span>
+        <router-link to="/register">去注册</router-link>
       </div>
     </div>
   </div>
@@ -71,14 +73,19 @@ async function onSubmit() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #3b6ef5 0%, #6a93f8 100%);
+  background:
+    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.18), transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.18), transparent 40%),
+    var(--cl-gradient-hero);
 }
 .auth-card {
-  width: 380px;
-  background: #fff;
-  border-radius: 12px;
-  padding: 40px 32px 32px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  width: 400px;
+  background: var(--cl-bg-glass);
+  backdrop-filter: blur(20px);
+  border-radius: var(--cl-radius-lg);
+  padding: 44px 36px 32px;
+  box-shadow: var(--cl-shadow-xl);
+  border: 1px solid rgba(255, 255, 255, 0.4);
 }
 .brand {
   display: flex;
@@ -88,24 +95,37 @@ async function onSubmit() {
   color: var(--cl-primary);
 }
 .brand h1 {
-  font-size: 26px;
+  font-size: 28px;
   margin: 0;
+  font-weight: 800;
+  letter-spacing: -0.5px;
 }
 .subtitle {
   text-align: center;
-  color: #909399;
-  margin: 8px 0 28px;
+  color: var(--cl-text-secondary);
+  margin: 10px 0 28px;
 }
 .submit-btn {
   width: 100%;
+  background: var(--cl-gradient-hero) !important;
+  border: none !important;
+  height: 44px;
+  font-weight: 600;
 }
 .auth-footer {
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
   margin-top: 18px;
-  font-size: 14px;
-  color: #606266;
+  font-size: 13px;
+  color: var(--cl-text-secondary);
 }
 .auth-footer a {
   color: var(--cl-primary);
+  font-weight: 500;
+}
+.link-secondary {
+  color: var(--cl-text-secondary) !important;
 }
 </style>

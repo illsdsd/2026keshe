@@ -23,8 +23,11 @@ public class TeamMember {
 
     private Long userId;
 
-    /** LEADER / MEMBER */
+    /** LEADER / LEADER_DEPUTY / MEMBER（v2 新增 LEADER_DEPUTY） */
     private String role;
+
+    /** 任命副队长时间，v2 新增 */
+    private LocalDateTime deputyTime;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime joinTime;

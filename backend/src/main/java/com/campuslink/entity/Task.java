@@ -32,6 +32,15 @@ public class Task {
     /** TODO / DOING / DONE */
     private String status;
 
+    /** LOW / MEDIUM / HIGH，v2 新增 */
+    private String priority;
+
+    /** 逗号分隔标签，v2 新增 */
+    private String tags;
+
+    /** 父任务 id，v2 子任务时填入主任务 id，主任务保持 null */
+    private Long parentId;
+
     private Integer sortOrder;
 
     @TableField(fill = FieldFill.INSERT)
