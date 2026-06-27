@@ -10,34 +10,33 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
- * 队伍实体。
+ * 赛事报名实体，v2 新增。
+ *
+ * <p>status 取 PENDING / APPROVED / REJECTED。
+ *
+ * @author liuguangyuan
+ * @since 2026/6/27
  */
 @Data
-@TableName("team")
-public class Team {
+@TableName("competition_register")
+public class CompetitionRegister {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    private String name;
-
     private Long competitionId;
 
-    private Long leaderId;
+    private Long teamId;
 
-    private String intro;
+    private Long applicantId;
 
-    private Integer totalSize;
+    private String remark;
 
-    private Integer currentSize;
-
-    private String college;
-
-    /** RECRUITING / FULL / CLOSED / ARCHIVED（v2 新增 ARCHIVED） */
     private String status;
 
-    /** 归档时间，v2 新增 */
-    private LocalDateTime archivedTime;
+    private String auditReason;
+
+    private LocalDateTime auditTime;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;

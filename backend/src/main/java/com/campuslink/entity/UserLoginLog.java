@@ -10,29 +10,31 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
- * 队伍公告实体。
+ * 用户登录日志实体，v2 新增。
+ *
+ * @author liuguangyuan
+ * @since 2026/6/27
  */
 @Data
-@TableName("notice")
-public class Notice {
+@TableName("user_login_log")
+public class UserLoginLog {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    private Long teamId;
+    private Long userId;
 
-    private Long authorId;
+    private String username;
 
-    private String title;
+    private String ip;
 
-    private String content;
+    private String device;
 
-    /** 定时发布时间，v2 新增；null 表示即时发布 */
-    private LocalDateTime publishAt;
+    /** 0失败/1成功 */
+    private Integer success;
 
-    /** 0即时/1定时，v2 新增 */
-    private Integer scheduled;
+    private String failReason;
 
     @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime createTime;
+    private LocalDateTime loginTime;
 }

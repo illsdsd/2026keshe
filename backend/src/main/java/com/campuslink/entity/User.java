@@ -45,6 +45,12 @@ public class User {
     /** STUDENT / ADMIN */
     private String role;
 
+    /** 0禁用/1启用，v2 新增 */
+    private Integer enabled;
+
+    /** 手机号，v2 新增 */
+    private String phone;
+
     @TableField(fill = com.baomidou.mybatisplus.annotation.FieldFill.INSERT)
     private LocalDateTime createTime;
 }

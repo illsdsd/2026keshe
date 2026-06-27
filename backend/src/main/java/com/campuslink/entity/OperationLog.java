@@ -10,34 +10,35 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
- * 队伍实体。
+ * 操作日志实体，v2 新增。
+ *
+ * @author liuguangyuan
+ * @since 2026/6/27
  */
 @Data
-@TableName("team")
-public class Team {
+@TableName("operation_log")
+public class OperationLog {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    private String name;
+    private Long userId;
 
-    private Long competitionId;
+    private String username;
 
-    private Long leaderId;
+    private String method;
 
-    private String intro;
+    private String path;
 
-    private Integer totalSize;
+    private String params;
 
-    private Integer currentSize;
+    private String ip;
 
-    private String college;
-
-    /** RECRUITING / FULL / CLOSED / ARCHIVED（v2 新增 ARCHIVED） */
     private String status;
 
-    /** 归档时间，v2 新增 */
-    private LocalDateTime archivedTime;
+    private String errorMsg;
+
+    private Integer costMs;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;

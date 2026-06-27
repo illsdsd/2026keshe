@@ -10,34 +10,26 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
- * 队伍实体。
+ * 任务模板实体，v2 新增。
+ *
+ * <p>payload 字段以 JSON 字符串存储任务结构（包含若干 title/priority/tags/子任务），
+ * 反序列化后用于一键复用建任务。
+ *
+ * @author liuguangyuan
+ * @since 2026/6/27
  */
 @Data
-@TableName("team")
-public class Team {
+@TableName("task_template")
+public class TaskTemplate {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
+    private Long ownerId;
+
     private String name;
 
-    private Long competitionId;
-
-    private Long leaderId;
-
-    private String intro;
-
-    private Integer totalSize;
-
-    private Integer currentSize;
-
-    private String college;
-
-    /** RECRUITING / FULL / CLOSED / ARCHIVED（v2 新增 ARCHIVED） */
-    private String status;
-
-    /** 归档时间，v2 新增 */
-    private LocalDateTime archivedTime;
+    private String payload;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;

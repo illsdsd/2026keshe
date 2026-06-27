@@ -7,37 +7,29 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * 队伍实体。
+ * 用户证书实体，v2 新增。
+ *
+ * @author liuguangyuan
+ * @since 2026/6/27
  */
 @Data
-@TableName("team")
-public class Team {
+@TableName("user_certificate")
+public class UserCertificate {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
+    private Long userId;
+
     private String name;
 
-    private Long competitionId;
+    private String imageUrl;
 
-    private Long leaderId;
-
-    private String intro;
-
-    private Integer totalSize;
-
-    private Integer currentSize;
-
-    private String college;
-
-    /** RECRUITING / FULL / CLOSED / ARCHIVED（v2 新增 ARCHIVED） */
-    private String status;
-
-    /** 归档时间，v2 新增 */
-    private LocalDateTime archivedTime;
+    private LocalDate obtainDate;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
